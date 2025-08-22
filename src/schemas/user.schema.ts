@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import * as commonTypes from '../../../common/types';
+import * as commonTypes from '../common/types';
 
 @Schema()
 export class User {
