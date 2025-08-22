@@ -7,10 +7,18 @@ import { ReservationsService } from './modules/reservations/reservations.service
 import { ReservationsModule } from './modules/reservations/reservations.module';
 import { ChatController } from './modules/chat/chat.controller';
 import { ChatModule } from './modules/chat/chat.module';
+import { RoomsService } from './modules/rooms/rooms.service';
+import { RoomsModule } from './modules/rooms/rooms.module';
 
 @Module({
-  imports: [UsersModule, HotelsModule, ReservationsModule, ChatModule],
+  imports: [
+    UsersModule,
+    HotelsModule,
+    ReservationsModule,
+    ChatModule,
+    RoomsModule,
+  ],
   controllers: [AppController, ChatController],
-  providers: [AppService, ReservationsService],
+  providers: [AppService, ReservationsService, RoomsService],
 })
 export class AppModule {}
