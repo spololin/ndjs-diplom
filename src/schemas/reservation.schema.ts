@@ -12,7 +12,11 @@ export class Reservation {
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'Hotel' })
   public hotelId: Hotel;
 
-  @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'Room' })
+  @Prop({
+    required: true,
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'HotelRoom',
+  })
   public roomId: HotelRoom;
 
   @Prop({ required: true })
