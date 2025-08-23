@@ -1,25 +1,113 @@
-import { Controller, Get, Param, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Query,
+  UploadedFiles,
+  UseInterceptors,
+  ParseFilePipeBuilder,
+  Put,
+} from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import { RoomDocument } from '../../schemas/rooms.schema';
 import * as hotels from '../../interfaces/hotels';
 import * as commonTypes from '../../common/types';
-import { SearchRoomDto } from '../../interfaces/hotels';
+import * as hotelsParams from '../../interfaces/hotels';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
-@Controller('common/hotel-rooms')
+@Controller()
 export class RoomsController {
   constructor(private readonly roomsService: RoomsService) {}
 
-  @Get()
-  public findAll(
+  @Get('common/hotel-rooms')
+  async find(
     @Query() params: hotels.SearchRoomsParams,
   ): Promise<RoomDocument[]> {
-    return this.roomsService.search(params);
+    return await this.roomsService.search(params);
   }
 
-  @Get(':id')
+  @Get('common/hotel-rooms/:id')
   async getById(@Param('id') id: commonTypes.ID) {
     const room = await this.roomsService.findById(id);
-    const roomData = room.toObject({ getters: true }) as SearchRoomDto;
+    const roomData = room.toObject({
+      getters: true,
+    }) as hotelsParams.SearchRoomDto;
+
+    return {
+      id: roomData.id,
+      description: roomData.description,
+      images: roomData.images,
+      hotel: {
+        id: roomData.hotel.id,
+        title: roomData.hotel.title,
+        description: roomData.hotel.description,
+      },
+    };
+  }
+
+  @Post('admin/hotel-rooms')
+  @UseInterceptors(FilesInterceptor('images', undefined))
+  async create(
+    @Body() body: hotelsParams.CreateRoomParams,
+    @UploadedFiles(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: 'image',
+        })
+        .build(),
+    )
+    images: Express.Multer.File[],
+  ) {
+    const room = (await this.roomsService.create({
+      ...body,
+      images: images.map((image) => image.filename),
+    })) as unknown as RoomDocument;
+    const roomData = room.toObject({
+      getters: true,
+    }) as hotelsParams.CreateRoomDto;
+
+    return {
+      id: roomData.id,
+      description: roomData.description,
+      images: roomData.images,
+      hotel: {
+        id: roomData.hotel.id,
+        title: roomData.hotel.title,
+        description: roomData.hotel.description,
+      },
+    };
+  }
+
+  @Put('admin/hotel-rooms/:id')
+  @UseInterceptors(FilesInterceptor('images', undefined))
+  async update(
+    @Body() body: hotelsParams.UpdateRoomParams,
+    @UploadedFiles(
+      new ParseFilePipeBuilder()
+        .addFileTypeValidator({
+          fileType: 'image',
+        })
+        .build(),
+    )
+    images: Express.Multer.File[],
+  ) {
+    const imagesInRoom: string[] = [];
+    if (body.images) {
+      if (Array.isArray(body.images)) {
+        imagesInRoom.push(...body.images);
+      } else {
+        imagesInRoom.push(body.images);
+      }
+    }
+    const room = (await this.roomsService.update(body.hotelId, {
+      ...body,
+      images: [...imagesInRoom, ...images.map((image) => image.filename)],
+    })) as unknown as RoomDocument;
+    const roomData = room.toObject({
+      getters: true,
+    }) as hotelsParams.CreateRoomDto;
 
     return {
       id: roomData.id,

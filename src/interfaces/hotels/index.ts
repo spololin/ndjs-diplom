@@ -44,3 +44,29 @@ export interface SearchRoomDto {
     description: string;
   };
 }
+
+export interface CreateRoomParams {
+  hotelId: ID;
+  title: string;
+  description: string;
+  images: string[];
+}
+
+export interface CreateRoomDto {
+  id: string;
+  description: string;
+  images: string[];
+  isEnabled: boolean;
+  hotel: {
+    id: string;
+    title: string;
+    description: string;
+  };
+}
+
+export interface UpdateRoomParams {
+  hotelId: ID;
+  isEnabled: boolean;
+  description: string;
+  images: string[];
+}
