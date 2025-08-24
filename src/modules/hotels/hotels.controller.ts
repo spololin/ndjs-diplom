@@ -3,8 +3,6 @@ import { HotelsService } from './hotels.service';
 import * as hotels from '../../interfaces/hotels';
 import { HotelDocument } from '../../schemas/hotel.schema';
 import * as commonTypes from '../../common/types';
-import { UpdateHotelParams } from '../../interfaces/hotels';
-import { ID } from '../../common/types';
 
 @Controller('admin/hotels')
 export class HotelsController {
@@ -33,14 +31,11 @@ export class HotelsController {
       id,
       params,
     ) as unknown as HotelDocument;
-    const hotelData = hotel.toObject({ getters: true }) as UpdateHotelParams & {
-      id: ID;
-    };
 
     return {
-      id: hotelData.id,
-      description: hotelData.description,
-      title: hotelData.title,
+      id: hotel._id,
+      description: hotel.description,
+      title: hotel.title,
     };
   }
 }

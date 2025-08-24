@@ -1,16 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
-import { Hotel } from './hotel.schema';
-import { User } from './user.schema';
+import * as hotelSchema from './hotel.schema';
+import * as userSchema from './user.schema';
 import { HotelRoom } from './rooms.schema';
 
 @Schema()
 export class Reservation {
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'User' })
-  public userId: User;
+  public userId: userSchema.UserDocument;
 
   @Prop({ required: true, type: mongoose.Schema.Types.ObjectId, ref: 'Hotel' })
-  public hotelId: Hotel;
+  public hotelId: hotelSchema.HotelDocument;
 
   @Prop({
     required: true,

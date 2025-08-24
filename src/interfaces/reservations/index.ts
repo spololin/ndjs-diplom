@@ -1,23 +1,32 @@
 import { ID } from '../../common/types';
-import { Reservation } from '../../schemas/reservation.schema';
+import {
+  Reservation,
+  ReservationDocument,
+} from '../../schemas/reservation.schema';
 
-interface ReservationDto {
+export interface ReservationDto {
   userId: ID;
-  hotelId: ID;
   roomId: ID;
   dateStart: Date;
   dateEnd: Date;
 }
 
-interface ReservationSearchOptions {
+export interface ReservationSearchOptions {
   userId: ID;
-  dateStart: Date;
-  dateEnd: Date;
+  dateStart?: Date;
+  dateEnd?: Date;
 }
-interface IReservation {
-  addReservation(data: ReservationDto): Promise<Reservation>;
+
+export interface IReservation {
+  addReservation(data: ReservationDto): Promise<ReservationDocument>;
   removeReservation(id: ID): Promise<void>;
   getReservations(
     filter: ReservationSearchOptions,
   ): Promise<Array<Reservation>>;
+}
+
+export interface CreateReservationParams {
+  hotelRoom: ID;
+  startDate: Date;
+  endDate: Date;
 }

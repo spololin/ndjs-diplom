@@ -1,11 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose, { Document } from 'mongoose';
-import { Hotel } from './hotel.schema';
+import * as hotelSchema from './hotel.schema';
 
 @Schema()
 export class HotelRoom {
   @Prop({ type: mongoose.Schema.Types.ObjectId, ref: 'Hotel', required: true })
-  public hotel: Hotel;
+  public hotel: hotelSchema.HotelDocument;
 
   @Prop()
   public description: string;

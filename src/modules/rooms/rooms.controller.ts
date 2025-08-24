@@ -31,18 +31,15 @@ export class RoomsController {
   @Get('common/hotel-rooms/:id')
   async getById(@Param('id') id: commonTypes.ID) {
     const room = await this.roomsService.findById(id);
-    const roomData = room.toObject({
-      getters: true,
-    }) as hotelsParams.SearchRoomDto;
 
     return {
-      id: roomData.id,
-      description: roomData.description,
-      images: roomData.images,
+      id: room._id,
+      description: room.description,
+      images: room.images,
       hotel: {
-        id: roomData.hotel.id,
-        title: roomData.hotel.title,
-        description: roomData.hotel.description,
+        id: room.hotel._id,
+        title: room.hotel.title,
+        description: room.hotel.description,
       },
     };
   }
@@ -64,18 +61,15 @@ export class RoomsController {
       ...body,
       images: images.map((image) => image.filename),
     })) as unknown as RoomDocument;
-    const roomData = room.toObject({
-      getters: true,
-    }) as hotelsParams.CreateRoomDto;
 
     return {
-      id: roomData.id,
-      description: roomData.description,
-      images: roomData.images,
+      id: room._id,
+      description: room.description,
+      images: room.images,
       hotel: {
-        id: roomData.hotel.id,
-        title: roomData.hotel.title,
-        description: roomData.hotel.description,
+        id: room.hotel._id,
+        title: room.hotel.title,
+        description: room.hotel.description,
       },
     };
   }
@@ -105,18 +99,15 @@ export class RoomsController {
       ...body,
       images: [...imagesInRoom, ...images.map((image) => image.filename)],
     })) as unknown as RoomDocument;
-    const roomData = room.toObject({
-      getters: true,
-    }) as hotelsParams.CreateRoomDto;
 
     return {
-      id: roomData.id,
-      description: roomData.description,
-      images: roomData.images,
+      id: room._id,
+      description: room.description,
+      images: room.images,
       hotel: {
-        id: roomData.hotel.id,
-        title: roomData.hotel.title,
-        description: roomData.hotel.description,
+        id: room.hotel._id,
+        title: room.hotel.title,
+        description: room.hotel.description,
       },
     };
   }
