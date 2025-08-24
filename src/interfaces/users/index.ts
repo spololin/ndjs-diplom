@@ -1,16 +1,28 @@
 import { User } from '../../schemas/user.schema';
-import { ID } from '../../common/types';
+import { ID, Role } from '../../common/types';
 
-interface SearchUserParams {
+export interface SearchUserParams {
   limit: number;
   offset: number;
   email: string;
   name: string;
   contactPhone: string;
 }
-interface IUserService {
-  create(data: Partial<User>): Promise<User>;
+
+export interface IUserService {
+  create(data: CreateUserDto): Promise<User>;
   findById(id: ID): Promise<User>;
   findByEmail(email: string): Promise<User>;
   findAll(params: SearchUserParams): Promise<User[]>;
+}
+
+export interface CreateUserParams {
+  email: string;
+  password: string;
+  name: string;
+  contactPhone: string;
+}
+
+export interface CreateUserDto extends CreateUserParams {
+  role: Role;
 }
