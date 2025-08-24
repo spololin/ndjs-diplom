@@ -69,4 +69,30 @@ export class ReservationsController {
   async deleteReservation(@Param('id') id: commonTypes.ID) {
     await this.reservationsService.removeReservation(id);
   }
+
+  @Get('manager/reservations/:userId')
+  async getManager(@Param('userId') id: commonTypes.ID) {
+    const reservations = await this.reservationsService.getReservations({
+      userId: id,
+    });
+
+    return reservations.map((reservation) => ({
+      startDate: reservation.dateStart,
+      endDate: reservation.dateEnd,
+      hotelRoom: {
+        description: reservation.roomId.description,
+        images: reservation.roomId.images,
+      },
+      hotel: {
+        title: reservation.hotelId.title,
+        description: reservation.hotelId.description,
+      },
+    }));
+  }
+
+  @Delete('manager/reservations/:id')
+  @HttpCode(204)
+  async deleteManager(@Param('id') id: commonTypes.ID) {
+    await this.reservationsService.removeReservation(id);
+  }
 }
