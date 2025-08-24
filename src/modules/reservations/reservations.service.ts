@@ -15,18 +15,18 @@ import {
 } from 'src/schemas/reservation.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
-import { RoomDocument } from '../../schemas/rooms.schema';
+import { RoomsService } from '../rooms/rooms.service';
 
 @Injectable()
 export class ReservationsService implements IReservation {
   constructor(
     @InjectModel(Reservation.name)
     private readonly reservationModel: Model<Reservation>,
-    private readonly RoomModel: Model<RoomDocument>,
+    private readonly roomService: RoomsService,
   ) {}
 
   async addReservation(data: ReservationDto): Promise<ReservationDocument> {
-    const room = await this.RoomModel.findById(data.roomId);
+    const room = await this.roomService.findById(data.roomId);
     if (!room) {
       throw new NotFoundException('Room not found');
     }
