@@ -1,11 +1,11 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import {
   GetChatListParams,
   ISupportRequestService,
   SendMessageDto,
 } from '../../interfaces/chat';
 import { ID } from 'src/common/types';
-import { Message } from 'src/schemas/message.schema';
+import { Message, MessageDocument } from 'src/schemas/message.schema';
 import {
   SupportRequest,
   SupportRequestDocument,
@@ -18,14 +18,25 @@ export class ChatService implements ISupportRequestService {
   constructor(
     @InjectModel(SupportRequest.name)
     private readonly supportRequestModel: Model<SupportRequestDocument>,
+    @InjectModel(Message.name)
+    private readonly messageModel: Model<MessageDocument>,
   ) {}
   async findSupportRequests(
     params: GetChatListParams,
   ): Promise<SupportRequestDocument[]> {
-    const query = {
-      user: params.user,
-      isActive: params.isActive,
-    };
+    const query: {
+      user?: ID;
+      isActive?: boolean;
+    } = {};
+
+    if (params.user) {
+      query.user = params.user;
+    }
+
+    if (params.isActive) {
+      query.isActive = params.isActive;
+    }
+
     return await this.supportRequestModel
       .find(query)
       .populate('user')
@@ -33,11 +44,36 @@ export class ChatService implements ISupportRequestService {
       .skip(<number>params.offset)
       .exec();
   }
-  sendMessage(data: SendMessageDto): Promise<Message> {
-    throw new Error('Method not implemented.');
+  async sendMessage(data: SendMessageDto): Promise<MessageDocument> {
+    const supportRequest = await this.supportRequestModel.findOne({
+      _id: data.supportRequest,
+    });
+
+    if (!supportRequest) {
+      throw new Error('Support request not found');
+    }
+
+    const message = new this.messageModel(data);
+    await (await message.save()).populate('author');
+
+    supportRequest.messages.push(message);
+    await supportRequest.save();
+
+    return message;
   }
-  getMessages(supportRequest: ID): Promise<Message[]> {
-    throw new Error('Method not implemented.');
+  async getMessages(supportRequestId: ID): Promise<MessageDocument[]> {
+    const supportRequest = await this.supportRequestModel.findOne({
+      _id: supportRequestId,
+    });
+
+    if (!supportRequest) {
+      throw new NotFoundException('Support request not found');
+    }
+
+    return await this.messageModel
+      .find({ _id: { $in: supportRequest.messages } })
+      .populate('author')
+      .exec();
   }
   subscribe(
     handler: (supportRequest: SupportRequest, message: Message) => void,

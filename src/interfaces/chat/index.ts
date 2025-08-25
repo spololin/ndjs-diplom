@@ -20,7 +20,7 @@ export interface MarkMessagesAsReadDto {
 }
 
 export interface GetChatListParams extends SearchRequestsParams {
-  user: ID | null;
+  user?: ID | null;
 }
 
 export interface ISupportRequestService {

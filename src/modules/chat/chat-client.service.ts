@@ -26,8 +26,25 @@ export class ChatClientService implements ISupportRequestClientService {
 
     return supportRequest;
   }
-  markMessagesAsRead(params: MarkMessagesAsReadDto) {
-    throw new Error('Method not implemented.');
+  async markMessagesAsRead(params: MarkMessagesAsReadDto) {
+    const supportRequest = await this.supportRequestModel.findById(
+      params.supportRequest,
+    );
+
+    if (!supportRequest) {
+      throw new Error('Request not found');
+    }
+
+    supportRequest.messages.forEach((message) => {
+      if (
+        !message.readAt &&
+        message.author.name !== supportRequest.userId.name
+      ) {
+        message.readAt = new Date();
+      }
+    });
+
+    await supportRequest.save();
   }
   async getUnreadCount(supportRequestId: ID): Promise<number> {
     const supportRequest =
@@ -37,6 +54,9 @@ export class ChatClientService implements ISupportRequestClientService {
       throw new NotFoundException('Request not found');
     }
 
-    return supportRequest.messages.filter((message) => !message.readAt).length;
+    return supportRequest.messages.filter(
+      (message) =>
+        !message.readAt && message.author.name !== supportRequest.userId.name,
+    ).length;
   }
 }
