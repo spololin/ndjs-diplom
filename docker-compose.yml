@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  app:
+    container_name: ndjs-diplom
+    build: .
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - MONGO_URL=mongodb://mongodb:27017/booking_hotels
+    depends_on:
+      - mongodb
+
+  mongodb:
+    container_name: mongodb
+    image: mongo:latest
+    environment:
+      - MONGO_INITDB_DATABASE=booking_hotels
+    volumes:
+      - mongodb-data:/data/db
+
+volumes:
+  mongodb-data:
